@@ -1,0 +1,39 @@
+import asyncio
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+
+TOKEN = "7520493343:AAFh5BW6BgKIh4YRs4kL4X7ih9AwbuUuhbk"
+
+users = {}
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+@dp.message(Command("start"))
+async def start(message: types.Message):
+    await message.reply("Привет! Отправь число напоминаний")
+
+@dp.message(lambda message: message.text.isdigit())
+async def set_reminder(message: types.Message):
+    user_id = message.from_user.id
+    try:
+        count = int(message.text)
+        users[user_id] = count
+        await message.reply(f"Буду напоминать {count} раз!")
+        
+        for i in range(count):
+            await asyncio.sleep(5)
+            await message.answer("🔔 Напоминание! https://youtu.be/dQw4w9WgXcQ")
+            
+    except Exception as e:
+        await message.reply(f"Произошла ошибка: {e}")
+
+@dp.message()
+async def handle_other_messages(message: types.Message):
+    await message.reply("Нужно отправить число")
+
+async def main():
+    print("Бот запущен!")
+    await dp.start_polling(bot)
+
+if __name__ == '__main__':
+    asyncio.run(main())
